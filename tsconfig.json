@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "CommonJS",
+    "target": "ES2019",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strictNullChecks": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["dist", "node_modules"],
+  "ignorePatterns": ["jest.config.ts"]
+}
