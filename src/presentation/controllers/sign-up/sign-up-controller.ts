@@ -1,6 +1,6 @@
-import { tryCatch } from '../../helpers/error-helper'
+import { tryCatch, tryCatchAsync } from '../../helpers/error-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, serverError } from '../../helpers/http-helper'
+import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { type HttpRequest, type HttpResponse } from '../../protocols/http'
 import { type Controller } from '../../protocols/controllers'
 import { type EmailValidator } from './sign-up-protocols'
@@ -17,7 +17,7 @@ export class SignUpController implements Controller {
     this.addAccount = addAccount
   }
 
-  handle (httpRequest: HttpRequest): HttpResponse {
+  async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     const { body } = httpRequest
 
     for (const field of requiredFields) {
@@ -44,15 +44,12 @@ export class SignUpController implements Controller {
     }
 
     const { name, email, password } = body
-    const { error: addAccountError } = tryCatch(() => this.addAccount.add({ name, email, password } satisfies AddAccountModel))
+    const { data, error: addAccountError } = await tryCatchAsync(this.addAccount.add({ name, email, password } satisfies AddAccountModel))
 
     if (addAccountError) {
       return serverError()
     }
 
-    return {
-      body: null,
-      statusCode: 400
-    }
+    return ok(data)
   }
 }
