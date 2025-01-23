@@ -1,10 +1,10 @@
-import { tryCatch } from '../helpers/error-helper'
-import { InvalidParamError, MissingParamError } from '../errors'
-import { badRequest, serverError } from '../helpers/http-helper'
-import { type HttpRequest, type HttpResponse } from '../protocols/http'
-import { type Controller } from '../protocols/controllers'
-import { type EmailValidator } from '../protocols/email-validator'
-import { type AddAccountModel, type AddAccount } from '../../domain/use-cases/add-account'
+import { tryCatch } from '../../helpers/error-helper'
+import { InvalidParamError, MissingParamError } from '../../errors'
+import { badRequest, serverError } from '../../helpers/http-helper'
+import { type HttpRequest, type HttpResponse } from '../../protocols/http'
+import { type Controller } from '../../protocols/controllers'
+import { type EmailValidator } from './sign-up-protocols'
+import { type AddAccountModel, type AddAccount } from '../../../domain/use-cases/add-account'
 
 const requiredFields = ['name', 'email', 'password', 'confirmPassword']
 

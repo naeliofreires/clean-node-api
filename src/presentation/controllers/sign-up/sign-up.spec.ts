@@ -1,8 +1,8 @@
-import { InvalidParamError, MissingParamError, ServerError } from '../errors'
-import { SignUpController } from './SignUpController'
-import { type AddAccountModel, type AddAccount } from '../../domain/use-cases/add-account'
-import { type EmailValidator } from '../protocols/email-validator'
-import { type AccountModel } from '../../domain/models/account-model'
+import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
+import { SignUpController } from './sign-up-controller'
+import { type AddAccountModel, type AddAccount } from '../../../domain/use-cases/add-account'
+import { type EmailValidator } from './sign-up-protocols'
+import { type AccountModel } from '../../../domain/models/account-model'
 
 /**
  * Notes
