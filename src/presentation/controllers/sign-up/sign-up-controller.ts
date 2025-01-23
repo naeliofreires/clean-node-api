@@ -44,7 +44,11 @@ export class SignUpController implements Controller {
     }
 
     const { name, email, password } = body
-    this.addAccount.add({ name, email, password } satisfies AddAccountModel)
+    const { error: addAccountError } = tryCatch(() => this.addAccount.add({ name, email, password } satisfies AddAccountModel))
+
+    if (addAccountError) {
+      return serverError()
+    }
 
     return {
       body: null,
