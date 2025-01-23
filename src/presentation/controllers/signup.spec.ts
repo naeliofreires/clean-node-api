@@ -1,16 +1,22 @@
 import { InvalidParamError, MissingParamError, ServerError } from '../errors'
+import { serverError } from '../helpers/http-helper'
 import { type EmailValidator } from '../protocols/email-validator'
 import { SignUpController } from './SignUpController'
 
 /**
  * Notes
- * SUT: significa System Under Test
+ * SUT: System Under Test
  */
 interface Instances {
-  sut: SignUpController
-  emailValidatorStub: EmailValidator
+  readonly sut: SignUpController
+  readonly emailValidatorStub: EmailValidator
 }
 
+/**
+ * Creates an instance of SignUpController with a stubbed EmailValidator.
+ *
+ * @returns {Instances} An object containing the SUT and dependencies.
+ */
 export function getSignUpControllerInstance (): Instances {
   class EmailValidatorStub implements EmailValidator {
     isValid (_email: string): boolean {
@@ -19,10 +25,11 @@ export function getSignUpControllerInstance (): Instances {
   }
 
   const emailValidatorStub = new EmailValidatorStub()
+  const sut = new SignUpController(emailValidatorStub)
 
   return {
     emailValidatorStub,
-    sut: new SignUpController(emailValidatorStub)
+    sut
   }
 }
 
@@ -131,14 +138,11 @@ describe('SignUp Controller', () => {
   })
 
   test('Should return 500 if EmailValidator throws', () => {
-    class EmailValidatorStub implements EmailValidator {
-      isValid (_email: string): boolean {
-        throw new Error()
-      }
-    }
+    const { sut, emailValidatorStub } = getSignUpControllerInstance()
 
-    const emailValidatorStub = new EmailValidatorStub()
-    const sut = new SignUpController(emailValidatorStub)
+    jest
+      .spyOn(emailValidatorStub, 'isValid')
+      .mockImplementationOnce(() => { throw new Error() as any })
 
     const httpRequest = {
       body: {
@@ -150,6 +154,7 @@ describe('SignUp Controller', () => {
     }
 
     const httpResponse = sut.handle(httpRequest)
+    console.log(httpResponse)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
   })
