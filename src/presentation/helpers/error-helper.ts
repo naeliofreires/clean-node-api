@@ -8,7 +8,6 @@ export function tryCatch<T> (fn: () => T): ToResult<T> {
     const data = fn()
     return { error: undefined, data }
   } catch (error) {
-    console.log('tryCatch:error')
     return { error, data: undefined }
   }
 }

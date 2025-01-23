@@ -1,7 +1,8 @@
 import { InvalidParamError, MissingParamError, ServerError } from '../errors'
-import { serverError } from '../helpers/http-helper'
-import { type EmailValidator } from '../protocols/email-validator'
 import { SignUpController } from './SignUpController'
+import { type AddAccountModel, type AddAccount } from '../../domain/use-cases/add-account'
+import { type EmailValidator } from '../protocols/email-validator'
+import { type AccountModel } from '../../domain/models/account-model'
 
 /**
  * Notes
@@ -9,27 +10,58 @@ import { SignUpController } from './SignUpController'
  */
 interface Instances {
   readonly sut: SignUpController
+  readonly addAccountStub: AddAccount
   readonly emailValidatorStub: EmailValidator
 }
 
 /**
- * Creates an instance of SignUpController with a stubbed EmailValidator.
+ * Factory for creating an EmailValidatorStub.
  *
- * @returns {Instances} An object containing the SUT and dependencies.
+ * @returns {EmailValidator} A stub implementation of EmailValidator.
  */
-export function getSignUpControllerInstance (): Instances {
+function makeEmailValidator (): EmailValidator {
   class EmailValidatorStub implements EmailValidator {
     isValid (_email: string): boolean {
       return true
     }
   }
+  return new EmailValidatorStub()
+}
 
-  const emailValidatorStub = new EmailValidatorStub()
-  const sut = new SignUpController(emailValidatorStub)
+/**
+ * Factory for creating an AddAccountStub.
+ *
+ * @returns {AddAccount} A stub implementation of AddAccount.
+ */
+function makeAddAccount (): AddAccount {
+  class AddAccountStub implements AddAccount {
+    add (data: AddAccountModel): AccountModel {
+      return {
+        id: 1,
+        name: 'valid_name',
+        email: 'valid_email',
+        password: 'valid_password'
+      }
+    }
+  }
+
+  return new AddAccountStub()
+}
+
+/**
+ * Factory for creating an instance of SignUpController.
+ *
+ * @returns {Instances} An object containing the SUT and dependencies.
+ */
+export function getSignUpControllerInstance (): Instances {
+  const emailValidatorStub = makeEmailValidator()
+  const addAccountStub = makeAddAccount()
+  const sut = new SignUpController(emailValidatorStub, addAccountStub)
 
   return {
-    emailValidatorStub,
-    sut
+    sut,
+    addAccountStub,
+    emailValidatorStub
   }
 }
 
@@ -119,6 +151,23 @@ describe('SignUp Controller', () => {
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
   })
 
+  test('Should return 400 if the password doesnt match', () => {
+    const { sut } = getSignUpControllerInstance()
+
+    const httpRequest = {
+      body: {
+        name: 'name',
+        email: 'email@gmai.com',
+        password: 'password',
+        confirmPassword: 'password.'
+      }
+    }
+
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new InvalidParamError('confirmPassword'))
+  })
+
   test('Should call EmailValidator with correct email', () => {
     const { sut, emailValidatorStub } = getSignUpControllerInstance()
 
@@ -154,8 +203,29 @@ describe('SignUp Controller', () => {
     }
 
     const httpResponse = sut.handle(httpRequest)
-    console.log(httpResponse)
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should call AddAccount with valid values', () => {
+    const { sut, addAccountStub } = getSignUpControllerInstance()
+
+    const addAccountSpy = jest.spyOn(addAccountStub, 'add')
+
+    const httpRequest = {
+      body: {
+        name: 'name',
+        email: 'valid@email.com',
+        password: 'password',
+        confirmPassword: 'password'
+      }
+    }
+
+    sut.handle(httpRequest)
+    expect(addAccountSpy).toHaveBeenCalledWith({
+      name: 'name',
+      email: 'valid@email.com',
+      password: 'password'
+    })
   })
 })
