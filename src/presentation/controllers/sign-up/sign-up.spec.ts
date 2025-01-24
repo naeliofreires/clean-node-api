@@ -3,7 +3,6 @@ import { SignUpController } from './sign-up-controller'
 import { type AddAccountModel, type AddAccount } from '../../../domain/use-cases/add-account'
 import { type EmailValidator } from './sign-up-protocols'
 import { type AccountModel } from '../../../domain/models/account-model'
-import { rejects } from 'node:assert'
 
 /**
  * Notes
