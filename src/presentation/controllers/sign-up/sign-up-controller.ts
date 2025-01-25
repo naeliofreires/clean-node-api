@@ -2,13 +2,13 @@ import { tryCatch, tryCatchAsync } from '../../helpers/error-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { type HttpRequest, type HttpResponse } from '../../protocols/http'
-import { type Controller } from '../../protocols/controllers'
+import { type IController } from '../../protocols/controllers'
 import { type EmailValidator } from './sign-up-protocols'
 import { type AddAccountModel, type AddAccount } from '../../../domain/use-cases/add-account'
 
 const requiredFields = ['name', 'email', 'password', 'confirmPassword']
 
-export class SignUpController implements Controller {
+export class SignUpController implements IController {
   private readonly emailValidator: EmailValidator
   private readonly addAccount: AddAccount
 
