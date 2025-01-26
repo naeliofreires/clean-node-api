@@ -18,11 +18,8 @@ const makeAddAccountRepositoryStub = (): IAddAccountRepository => {
   class AddAccountRepositoryStub implements IAddAccountRepository {
     async add (data: AddAccountModel): Promise<AccountModel> {
       return await new Promise(resolve => {
-        resolve({
-          id: 1,
-          ...data,
-          password: 'hashed'
-        })
+        const fake = { ...data, id: 1, password: 'hashed' }
+        resolve(fake)
       })
     }
   }
@@ -90,9 +87,42 @@ describe('DB add account', () => {
 
     await sut.add(data)
     expect(addSpy).toHaveBeenCalledWith({
-      id: 1,
       name: 'name',
       email: 'email@gmail.com',
+      password: 'hashed'
+    })
+  })
+
+  test('Should throw if AddAccountRepository throws', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+
+    jest
+      .spyOn(addAccountRepositoryStub, 'add')
+      .mockReturnValueOnce(new Promise((resolve, reject) => { reject(new Error()) }))
+
+    const data: AddAccountModel = {
+      name: 'name',
+      email: 'email@gmail.com',
+      password: 'password'
+    }
+
+    const returnedPromise = sut.add(data)
+    await expect(returnedPromise).rejects.toThrow()
+  })
+
+  test('Should return an account on success', async () => {
+    const { sut } = makeSut()
+
+    const data: AddAccountModel = {
+      name: 'name',
+      email: 'email@gmail.com',
+      password: 'password'
+    }
+
+    const response = await sut.add(data)
+    expect(response).toEqual({
+      id: 1,
+      ...data,
       password: 'hashed'
     })
   })
