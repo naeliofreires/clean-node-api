@@ -4,3 +4,4 @@ dist/
 jest.config.ts
 jest-unit-config.js
 jest-integration-config.js
+jest-mongodb-config.js
