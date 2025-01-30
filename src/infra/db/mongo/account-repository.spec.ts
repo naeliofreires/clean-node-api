@@ -18,11 +18,15 @@ describe('Mongo: account repository', () => {
     await MonogHelper.disconnect()
   })
 
+  beforeEach(async () => {
+    MonogHelper.cleanCollection('accounts')
+  })
+
   test('Should return an account on success', async () => {
     const { sut } = makeSut()
     const added = await sut.add({
       name: 'valid_name',
-      password: 'valid_passwod',
+      password: 'valid_password',
       email: 'valid@email.com'
     })
 
@@ -30,6 +34,6 @@ describe('Mongo: account repository', () => {
     expect(added.id).toBeTruthy()
     expect(added.name).toBe('valid_name')
     expect(added.email).toBe('valid@email.com')
-    expect(added.password).toBe('valid_passowrd')
+    expect(added.password).toBe('valid_password')
   })
 })

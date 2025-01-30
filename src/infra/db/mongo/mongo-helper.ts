@@ -1,4 +1,4 @@
-import { MongoClient, type MongoClientOptions } from 'mongodb'
+import { MongoClient, type MongoClientOptions, type Collection } from 'mongodb'
 
 const connectOptions: MongoClientOptions = {
   // @ts-expect-error
@@ -11,7 +11,16 @@ export const MonogHelper = {
   async connect (uri: string, options?: MongoClientOptions) {
     this.client = await MongoClient.connect(uri, options ?? connectOptions)
   },
+
   async disconnect () {
     await this.client.close()
+  },
+
+  getCollection (name: string): Collection {
+    return this.client.db().collection(name)
+  },
+
+  cleanCollection (name: string) {
+    this.client.db().collection(name).deleteMany({})
   }
 }
