@@ -7,6 +7,13 @@
     "@typescript-eslint/prefer-nullish-coalescing": "off",
     "@typescript-eslint/strict-boolean-expressions": "off",
     "@typescript-eslint/ban-ts-comment": "off"
-
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.test.ts"],
+      "rules": {
+        "@typescript-eslint/no-misused-promises": "off"
+      }
+    }
+  ]
 }

@@ -7,7 +7,7 @@
     "test": "jest --passWithNoTests --watch",
     "test:silent": "npm test --silent",
     "test:unit": "npm test -c jest-unit-config.js",
-    "test:integration": "npm test -c jest-integration-config.js"
+    "test:integration": "npm test -c jest-integration-config.js --silent"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +39,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "express": "^4.21.2",
+    "fast-glob": "^3.3.3",
     "mongodb": "^6.12.0",
     "validator": "^13.12.0"
   }
