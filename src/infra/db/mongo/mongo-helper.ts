@@ -5,7 +5,6 @@ const connectOptions: MongoClientOptions = {}
 export const MonogHelper = {
   client: null as MongoClient,
   async connect (uri: string, options?: MongoClientOptions) {
-    console.log({uri})
     this.client = await MongoClient.connect(uri, options ?? connectOptions)
   },
 
