@@ -3,23 +3,21 @@ import { DbAddAccount } from '../../data/use-case/add-account/db-add-account'
 import { BcrypterAdapter } from '../../infra/criptography/BcryptAdapter'
 import { AccountRepository } from '../../infra/db/mongo/account-repository'
 import { SignUpController } from '../../presentation/controllers/sign-up/sign-up-controller'
+import { type IController } from '../../presentation/protocols/controllers'
+import { LogControllerDecorator } from '../decorators/log'
 
-const makeEmailValidatorAdapter = (): EmailValidatorAdapter => new EmailValidatorAdapter()
-
-const makeBcrypterAdapter = (): BcrypterAdapter => new BcrypterAdapter()
-
-export const makeAccountRepository = (): AccountRepository => new AccountRepository()
-
-export const makeDbAddAccount = (): DbAddAccount => {
-  const encrypter = makeBcrypterAdapter()
-  const accountRepository = makeAccountRepository()
+const makeDbAddAccount = (): DbAddAccount => {
+  const encrypter = new BcrypterAdapter()
+  const accountRepository = new AccountRepository()
 
   return new DbAddAccount(encrypter, accountRepository)
 }
 
-export const makeSignupController = (): SignUpController => {
-  const emailValidatorAdapter = makeEmailValidatorAdapter()
+export const makeSignupController = (): IController => {
+  const emailValidatorAdapter = new EmailValidatorAdapter()
   const addAccount = makeDbAddAccount()
 
-  return new SignUpController(emailValidatorAdapter, addAccount)
+  const signUpController = new SignUpController(emailValidatorAdapter, addAccount)
+
+  return new LogControllerDecorator(signUpController)
 }

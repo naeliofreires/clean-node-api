@@ -4,15 +4,22 @@ const connectOptions: MongoClientOptions = {}
 
 export const MonogHelper = {
   client: null as MongoClient,
+  uri: null as string,
+
   async connect (uri: string, options?: MongoClientOptions) {
+    this.uri = uri
     this.client = await MongoClient.connect(uri, options ?? connectOptions)
   },
 
   async disconnect () {
-    await this.client.close()
+    await this.client?.close()
+    this.client = null
   },
 
-  getCollection (name: string): Collection {
+  async getCollection (name: string): Promise<Collection> {
+    if (this.client === null) {
+      await this.connect(this.uri)
+    }
     return this.client.db().collection(name)
   },
 
