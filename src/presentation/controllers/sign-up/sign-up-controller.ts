@@ -36,7 +36,7 @@ export class SignUpController implements IController {
     } = tryCatch(() => this.emailValidator.isValid(body.email as string))
 
     if (emailValidatorError) {
-      return serverError()
+      return serverError(emailValidatorError)
     }
 
     if (!isEmailValid) {
@@ -47,7 +47,7 @@ export class SignUpController implements IController {
     const { data, error: addAccountError } = await tryCatchAsync(this.addAccount.add({ name, email, password } satisfies AddAccountModel))
 
     if (addAccountError) {
-      return serverError()
+      return serverError(addAccountError)
     }
 
     return ok(data)

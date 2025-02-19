@@ -1,5 +1,5 @@
 interface ToResult<T> {
-  error: { message: string } & any
+  error: Error
   data: T | undefined
 }
 
