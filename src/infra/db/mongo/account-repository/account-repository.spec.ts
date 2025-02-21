@@ -1,6 +1,6 @@
-import { type IAddAccountRepository } from '../../../data/protocols/add-account-repository'
+import { type IAddAccountRepository } from '../../../../data/protocols/add-account-repository'
 import { AccountRepository } from './account-repository'
-import { MongoHelper } from './mongo-helper'
+import { MongoHelper } from '../mongo-helper'
 
 const makeSut = (): { sut: IAddAccountRepository } => {
   const sut = new AccountRepository()
