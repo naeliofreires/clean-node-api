@@ -1,6 +1,6 @@
-import { MonogHelper } from '../infra/db/mongo/mongo-helper'
+import { MongoHelper } from '../infra/db/mongo/mongo-helper'
 
-void MonogHelper
+void MongoHelper
   .connect(process.env.MONGO_URL || 'mongodb://localhost:27017/clean-node-api-db')
   .then(async () => {
     const app = (await import('./app')).default

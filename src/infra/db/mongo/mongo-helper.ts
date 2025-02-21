@@ -2,7 +2,7 @@ import { MongoClient, type MongoClientOptions, type Collection } from 'mongodb'
 
 const connectOptions: MongoClientOptions = {}
 
-export const MonogHelper = {
+export const MongoHelper = {
   client: null as MongoClient,
   uri: null as string,
 
