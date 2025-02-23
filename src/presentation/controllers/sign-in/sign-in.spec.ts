@@ -2,6 +2,7 @@ import { SignInController } from './sign-in-controller'
 import { badRequest, serverError } from '../../helpers/http-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { type EmailValidator } from '../sign-up/sign-up-protocols'
+import { type Authentication } from '../../../domain/use-cases/authentication'
 
 class EmailValidatorStub implements EmailValidator {
   isValid (): boolean {
@@ -9,14 +10,22 @@ class EmailValidatorStub implements EmailValidator {
   }
 }
 
-const makeSut = (): { sut: SignInController, emailValidatorStub: EmailValidatorStub } => {
-  const emailValidatorStub = new EmailValidatorStub()
+class AuthenticationStub implements Authentication {
+  async auth (): Promise<string> {
+    return 'any_token'
+  }
+}
 
-  const sut = new SignInController(emailValidatorStub)
+const makeSut = (): { sut: SignInController, emailValidatorStub: EmailValidatorStub, authenticationStub: AuthenticationStub } => {
+  const emailValidatorStub = new EmailValidatorStub()
+  const authenticationStub = new AuthenticationStub()
+
+  const sut = new SignInController(emailValidatorStub, authenticationStub)
 
   return {
     sut,
-    emailValidatorStub
+    emailValidatorStub,
+    authenticationStub
   }
 }
 
@@ -98,5 +107,22 @@ describe('SignInController', () => {
 
     const response = await sut.handle(request)
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should call auth with correct params', async () => {
+    const { sut, authenticationStub } = makeSut()
+
+    const authSpy = jest.spyOn(authenticationStub, 'auth')
+
+    const request = {
+      body: {
+        email: 'email@gmail.com',
+        password: '<PASSWORD>'
+      }
+    }
+
+    await sut.handle(request)
+    expect(authSpy).toHaveBeenCalledTimes(1)
+    expect(authSpy).toHaveBeenCalledWith('email@gmail.com', '<PASSWORD>')
   })
 })
