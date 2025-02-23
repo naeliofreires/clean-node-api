@@ -126,7 +126,7 @@ describe('SignInController', () => {
     expect(authSpy).toHaveBeenCalledWith('email@gmail.com', '<PASSWORD>')
   })
 
-  test('Should return 401 if email validator throws', async () => {
+  test('Should return 401 if auth failed', async () => {
     const { sut, authenticationStub } = makeSut()
 
     jest
@@ -142,5 +142,23 @@ describe('SignInController', () => {
 
     const response = await sut.handle(request)
     expect(response).toEqual(unauthorized())
+  })
+
+  test('Should return 500 if auth throws', async () => {
+    const { sut, authenticationStub } = makeSut()
+
+    jest
+      .spyOn(authenticationStub, 'auth')
+      .mockReturnValueOnce(new Promise((_resolve, reject) => { reject(new Error()) }))
+
+    const request = {
+      body: {
+        email: 'email@gmail.com',
+        password: '<PASSWORD>'
+      }
+    }
+
+    const response = await sut.handle(request)
+    expect(response).toEqual(serverError(new Error()))
   })
 })
