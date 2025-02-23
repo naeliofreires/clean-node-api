@@ -1,5 +1,5 @@
 import { SignInController } from './sign-in-controller'
-import { badRequest, serverError } from '../../helpers/http-helper'
+import { badRequest, serverError, unauthorized } from '../../helpers/http-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { type EmailValidator } from '../sign-up/sign-up-protocols'
 import { type Authentication } from '../../../domain/use-cases/authentication'
@@ -124,5 +124,23 @@ describe('SignInController', () => {
     await sut.handle(request)
     expect(authSpy).toHaveBeenCalledTimes(1)
     expect(authSpy).toHaveBeenCalledWith('email@gmail.com', '<PASSWORD>')
+  })
+
+  test('Should return 401 if email validator throws', async () => {
+    const { sut, authenticationStub } = makeSut()
+
+    jest
+      .spyOn(authenticationStub, 'auth')
+      .mockReturnValueOnce(new Promise((resolve) => { resolve(null) }))
+
+    const request = {
+      body: {
+        email: 'email@gmail.com',
+        password: '<PASSWORD>'
+      }
+    }
+
+    const response = await sut.handle(request)
+    expect(response).toEqual(unauthorized())
   })
 })
