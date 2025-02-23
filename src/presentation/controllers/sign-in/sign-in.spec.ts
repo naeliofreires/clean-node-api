@@ -1,5 +1,5 @@
 import { SignInController } from './sign-in-controller'
-import { badRequest, serverError, unauthorized } from '../../helpers/http-helper'
+import { badRequest, ok, serverError, unauthorized } from '../../helpers/http-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { type EmailValidator } from '../sign-up/sign-up-protocols'
 import { type Authentication } from '../../../domain/use-cases/authentication'
@@ -160,5 +160,19 @@ describe('SignInController', () => {
 
     const response = await sut.handle(request)
     expect(response).toEqual(serverError(new Error()))
+  })
+
+  test('Should return 200 if credentials is valid', async () => {
+    const { sut } = makeSut()
+
+    const request = {
+      body: {
+        email: 'email@gmail.com',
+        password: '<PASSWORD>'
+      }
+    }
+
+    const response = await sut.handle(request)
+    expect(response).toEqual(ok({ accessToken: 'any_token' }))
   })
 })
