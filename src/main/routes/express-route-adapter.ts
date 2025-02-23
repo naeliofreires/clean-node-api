@@ -1,12 +1,15 @@
-import { type Request, type Response } from 'express'
-import { type IController } from '../../presentation/protocols/controllers'
-import { type HttpRequest, type HttpResponse } from '../../presentation/protocols/http'
+import { type Request, type Response } from "express";
+import { type IController } from "../../presentation/protocols/controllers";
+import {
+  type HttpRequest,
+  type HttpResponse,
+} from "../../presentation/protocols/http";
 
-export default function adapter (controller: IController) {
+export default function adapter(controller: IController) {
   return async (req: Request, res: Response) => {
-    const httpRequest: HttpRequest = { body: req.body }
-    const HttpResponse: HttpResponse = await controller.handle(httpRequest)
+    const httpRequest: HttpRequest = { body: req.body };
+    const httpResponse: HttpResponse = await controller.handle(httpRequest);
 
-    res.status(HttpResponse.statusCode).json(HttpResponse.body)
-  }
+    res.status(httpResponse.statusCode).json(httpResponse.body);
+  };
 }
