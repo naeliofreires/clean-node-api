@@ -1,5 +1,5 @@
-import { type EmailValidator } from '../../presentation/controllers/sign-up/sign-up-protocols'
 import validator from 'validator'
+import { type EmailValidator } from '../../presentation/protocols/email-validator'
 
 export class EmailValidatorAdapter implements EmailValidator {
   isValid (email: string): boolean {

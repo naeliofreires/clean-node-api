@@ -2,8 +2,8 @@ import { type IController } from '../../protocols/controllers'
 import { type HttpRequest, type HttpResponse } from '../../protocols/http'
 import { badRequest, ok, serverError, unauthorized } from '../../helpers/http-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { type EmailValidator } from '../sign-up/sign-up-protocols'
 import { type Authentication } from '../../../domain/use-cases/authentication'
+import { type EmailValidator } from '../../protocols/email-validator'
 
 export class SignInController implements IController {
   private readonly emailValidator: EmailValidator

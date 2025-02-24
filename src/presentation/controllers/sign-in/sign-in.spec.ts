@@ -1,8 +1,8 @@
 import { SignInController } from './sign-in-controller'
 import { badRequest, ok, serverError, unauthorized } from '../../helpers/http-helper'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { type EmailValidator } from '../sign-up/sign-up-protocols'
 import { type Authentication } from '../../../domain/use-cases/authentication'
+import { type EmailValidator } from '../../protocols/email-validator'
 
 class EmailValidatorStub implements EmailValidator {
   isValid (): boolean {
