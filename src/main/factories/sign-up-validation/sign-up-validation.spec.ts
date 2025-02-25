@@ -1,8 +1,8 @@
 import { makeSignUpValidation } from './sign-up-validation'
-import { ValidatorComposite } from '../../../presentation/helpers/validator-composite'
-import { RequiredFieldValidation } from '../../../presentation/helpers/required-field-validation'
+import { ValidatorComposite } from '../../../presentation/helpers/validation/validator-composite'
+import { RequiredFieldValidation } from '../../../presentation/helpers/validation/required-field-validation'
 
-jest.mock('../../../presentation/helpers/validator-composite')
+jest.mock('../../../presentation/helpers/validation/validator-composite')
 
 describe('SignUpValidation Factory', () => {
   test('Should  call ValidationComposite with all validations', () => {
