@@ -38,7 +38,7 @@ function makeEmailValidator (): EmailValidator {
  */
 function makeAddAccount (): AddAccount {
   class AddAccountStub implements AddAccount {
-    async add (data: AddAccountModel): Promise<AccountModel> {
+    async add (_data: AddAccountModel): Promise<AccountModel> {
       const fake = {
         id: 1,
         name: 'valid_name',

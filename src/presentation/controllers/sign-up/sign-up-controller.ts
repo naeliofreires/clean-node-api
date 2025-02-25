@@ -10,18 +10,18 @@ import { type EmailValidator } from '../../protocols/email-validator'
 export class SignUpController implements IController {
   private readonly emailValidator: EmailValidator
   private readonly addAccount: AddAccount
-  private readonly validation: Validation
+  private readonly validationComposite: Validation
 
-  constructor (emailValidator: EmailValidator, addAccount: AddAccount, validation: Validation) {
+  constructor (emailValidator: EmailValidator, addAccount: AddAccount, validationComposite: Validation) {
     this.emailValidator = emailValidator
     this.addAccount = addAccount
-    this.validation = validation
+    this.validationComposite = validationComposite
   }
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     const { body } = httpRequest
 
-    const hasError = this.validation.validate(body)
+    const hasError = this.validationComposite.validate(body)
 
     if (hasError) {
       return badRequest(hasError)
