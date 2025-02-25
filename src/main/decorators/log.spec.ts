@@ -1,6 +1,7 @@
 import { LogControllerDecorator } from './log'
 import type { IController } from '../../presentation/protocols/controllers'
 import { type HttpRequest, type HttpResponse } from '../../presentation/protocols/http'
+import { LogRepository } from '../../infra/db/mongo/log-repository/log-repository'
 
 const makeSut = (): { sut: IController, controllerStub: IController } => {
   class ControllerStub implements IController {
@@ -17,7 +18,8 @@ const makeSut = (): { sut: IController, controllerStub: IController } => {
   }
 
   const controllerStub = new ControllerStub()
-  const logController = new LogControllerDecorator(controllerStub)
+  const logRepository = new LogRepository()
+  const logController = new LogControllerDecorator(controllerStub, logRepository)
 
   return { sut: logController, controllerStub }
 }
