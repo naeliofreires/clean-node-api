@@ -1,4 +1,3 @@
-import { EmailValidatorAdapter } from '../../adapters/email-validator/email-validator-adapter'
 import { DbAddAccount } from '../../data/use-case/add-account/db-add-account'
 import { BcrypterAdapter } from '../../infra/criptography/BcryptAdapter'
 import { SignUpController } from '../../presentation/controllers/sign-up/sign-up-controller'
@@ -17,12 +16,11 @@ const makeDbAddAccount = (): DbAddAccount => {
 
 export const makeSignupController = (): IController => {
   const logErrorRepository = new LogRepository()
-  const emailValidatorAdapter = new EmailValidatorAdapter()
 
   const addAccount = makeDbAddAccount()
   const validationComposite = makeSignUpValidation()
 
-  const signUpController = new SignUpController(emailValidatorAdapter, addAccount, validationComposite)
+  const signUpController = new SignUpController(addAccount, validationComposite)
 
   return new LogControllerDecorator(signUpController, logErrorRepository)
 }

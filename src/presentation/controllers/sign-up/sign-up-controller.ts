@@ -1,19 +1,15 @@
-import { tryCatch, tryCatchAsync } from '../../helpers/error-helper'
-import { InvalidParamError } from '../../errors'
+import { tryCatchAsync } from '../../helpers/error-helper'
 import { badRequest, ok, serverError } from '../../helpers/http-helper'
 import { type HttpRequest, type HttpResponse } from '../../protocols/http'
 import { type IController } from '../../protocols/controllers'
 import { type AddAccountModel, type AddAccount } from '../../../domain/use-cases/add-account'
 import { type Validation } from '../../protocols/validation'
-import { type EmailValidator } from '../../protocols/email-validator'
 
 export class SignUpController implements IController {
-  private readonly emailValidator: EmailValidator
   private readonly addAccount: AddAccount
   private readonly validationComposite: Validation
 
-  constructor (emailValidator: EmailValidator, addAccount: AddAccount, validationComposite: Validation) {
-    this.emailValidator = emailValidator
+  constructor (addAccount: AddAccount, validationComposite: Validation) {
     this.addAccount = addAccount
     this.validationComposite = validationComposite
   }
@@ -25,19 +21,6 @@ export class SignUpController implements IController {
 
     if (hasError) {
       return badRequest(hasError)
-    }
-
-    const {
-      data: isEmailValid,
-      error: emailValidatorError
-    } = tryCatch(() => this.emailValidator.isValid(body.email as string))
-
-    if (emailValidatorError) {
-      return serverError(emailValidatorError)
-    }
-
-    if (!isEmailValid) {
-      return badRequest(new InvalidParamError('email'))
     }
 
     const { name, email, password } = body

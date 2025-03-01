@@ -7,7 +7,7 @@
     "test": "jest --passWithNoTests --watch",
     "test:silent": "npm test --silent",
     "test:unit": "npm test -c jest-unit-config.js",
-    "test:integration": "npm test -c jest-integration-config.js --silent"
+    "test:integration": "npm test -c jest-integration-config.js"
   },
   "keywords": [],
   "author": "",
