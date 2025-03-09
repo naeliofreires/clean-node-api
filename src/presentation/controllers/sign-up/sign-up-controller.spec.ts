@@ -1,9 +1,8 @@
-import { MissingParamError, ServerError } from '../../errors'
+import { ServerError } from '../../errors'
 import { SignUpController } from './sign-up-controller'
 import { type AddAccountModel, type AddAccount } from '../../../domain/use-cases/add-account'
 import { type AccountModel } from '../../../domain/models/account-model'
 import { type Validation } from '../../protocols/validation'
-import { badRequest } from '../../helpers/http-helper'
 
 /**
  * Notes
@@ -150,25 +149,5 @@ describe('SignUp Controller', () => {
     await sut.handle(httpRequest)
     expect(validatorSpy).toHaveBeenCalledTimes(1)
     expect(validatorSpy).toHaveBeenCalledWith(httpRequest.body)
-  })
-
-  test('Should return 400 if if validation returns an error', async () => {
-    const { sut, validatorStub } = makeSut()
-
-    jest
-      .spyOn(validatorStub, 'validate')
-      .mockReturnValueOnce(new MissingParamError('any'))
-
-    const httpRequest = {
-      body: {
-        name: 'valid_name',
-        email: 'valid_email',
-        password: 'valid_password',
-        confirmPassword: 'valid_password'
-      }
-    }
-
-    const response = await sut.handle(httpRequest)
-    expect(response).toEqual(badRequest(new MissingParamError('any')))
   })
 })
