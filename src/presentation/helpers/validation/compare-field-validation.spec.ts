@@ -4,7 +4,7 @@ import { InvalidParamError } from '../../errors'
 describe('CompareFieldValidation', () => {
   test('Should return a InvalidParamError if validation fails', () => {
     const sut = new CompareFieldValidation('field', 'field2')
-    const error = sut.validate({} as any)
+    const error = sut.validate({ field: 'value' } as any)
     expect(error).toEqual(new InvalidParamError('field must be equal to field2'))
   })
 
