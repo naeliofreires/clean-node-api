@@ -1,17 +1,17 @@
 import { SignInController } from './sign-in-controller'
 import { badRequest, ok, serverError, unauthorized } from '../../helpers/http-helper'
 import { MissingParamError } from '../../errors'
-import { type Authentication } from '../../../domain/use-cases/authentication'
+import { type Authentication, type AuthenticationParams } from '../../../domain/use-cases/authentication'
 import { type Validation } from '../../protocols/validation'
 
 class AuthenticationStub implements Authentication {
-  async auth (): Promise<string> {
+  async auth(params: AuthenticationParams): Promise<string> {
     return 'any_token'
   }
 }
 
 class ValidationStub implements Validation {
-  validate (_input: any): Error | null {
+  validate(_input: any): Error | null {
     return undefined
   }
 }
@@ -48,8 +48,12 @@ describe('SignInController', () => {
 
     await sut.handle(request)
     expect(authSpy).toHaveBeenCalledTimes(1)
-    expect(authSpy).toHaveBeenCalledWith('email@gmail.com', '<PASSWORD>')
+    expect(authSpy).toHaveBeenCalledWith({
+      email: 'email@gmail.com',
+      password: '<PASSWORD>'
+    })
   })
+
 
   test('Should return 401 if auth failed', async () => {
     const { sut, authenticationStub } = makeSut()

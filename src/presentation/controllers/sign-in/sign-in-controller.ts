@@ -8,12 +8,12 @@ export class SignInController implements IController {
   private readonly authentication: Authentication
   private readonly validation: Validation
 
-  constructor (authentication: Authentication, validation: Validation) {
+  constructor(authentication: Authentication, validation: Validation) {
     this.authentication = authentication
     this.validation = validation
   }
 
-  async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
+  async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
       const { body } = httpRequest
 
@@ -21,7 +21,10 @@ export class SignInController implements IController {
 
       if (error) { return badRequest(error) }
 
-      const token = await this.authentication.auth(body.email as string, body.password as string)
+      const token = await this.authentication.auth({
+        email: body.email as string,
+        password: body.password as string,
+      });
 
       if (!token) { return unauthorized() }
 
