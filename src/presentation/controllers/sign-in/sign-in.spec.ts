@@ -5,7 +5,7 @@ import { type Authentication, type AuthenticationParams } from '../../../domain/
 import { type Validation } from '../../protocols/validation'
 
 class AuthenticationStub implements Authentication {
-  async auth(params: AuthenticationParams): Promise<string> {
+  async auth(params: AuthenticationParams): Promise<string | null> {
     return 'any_token'
   }
 }
@@ -29,7 +29,7 @@ const makeSut = (): {
   return {
     sut,
     authenticationStub,
-    validationStub
+    validationStub,
   }
 }
 
@@ -42,31 +42,32 @@ describe('SignInController', () => {
     const request = {
       body: {
         email: 'email@gmail.com',
-        password: '<PASSWORD>'
-      }
+        password: '<PASSWORD>',
+      },
     }
 
     await sut.handle(request)
     expect(authSpy).toHaveBeenCalledTimes(1)
     expect(authSpy).toHaveBeenCalledWith({
       email: 'email@gmail.com',
-      password: '<PASSWORD>'
+      password: '<PASSWORD>',
     })
   })
-
 
   test('Should return 401 if auth failed', async () => {
     const { sut, authenticationStub } = makeSut()
 
-    jest
-      .spyOn(authenticationStub, 'auth')
-      .mockReturnValueOnce(new Promise((resolve) => { resolve(null) }))
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolve(null)
+      })
+    )
 
     const request = {
       body: {
         email: 'email@gmail.com',
-        password: '<PASSWORD>'
-      }
+        password: '<PASSWORD>',
+      },
     }
 
     const response = await sut.handle(request)
@@ -76,15 +77,17 @@ describe('SignInController', () => {
   test('Should return 500 if auth throws', async () => {
     const { sut, authenticationStub } = makeSut()
 
-    jest
-      .spyOn(authenticationStub, 'auth')
-      .mockReturnValueOnce(new Promise((_resolve, reject) => { reject(new Error()) }))
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(
+      new Promise((_resolve, reject) => {
+        reject(new Error())
+      })
+    )
 
     const request = {
       body: {
         email: 'email@gmail.com',
-        password: '<PASSWORD>'
-      }
+        password: '<PASSWORD>',
+      },
     }
 
     const response = await sut.handle(request)
@@ -97,8 +100,8 @@ describe('SignInController', () => {
     const request = {
       body: {
         email: 'email@gmail.com',
-        password: '<PASSWORD>'
-      }
+        password: '<PASSWORD>',
+      },
     }
 
     const response = await sut.handle(request)
@@ -112,8 +115,8 @@ describe('SignInController', () => {
     const request = {
       body: {
         email: 'email@gmail.com',
-        password: '<PASSWORD>'
-      }
+        password: '<PASSWORD>',
+      },
     }
 
     await sut.handle(request)
@@ -122,9 +125,7 @@ describe('SignInController', () => {
 
   test('Should return 400 if validation returns an error', async () => {
     const { sut, validationStub } = makeSut()
-    jest
-      .spyOn(validationStub, 'validate')
-      .mockReturnValueOnce(new MissingParamError('any_value'))
+    jest.spyOn(validationStub, 'validate').mockReturnValueOnce(new MissingParamError('any_value'))
 
     const response = await sut.handle({})
     expect(response).toEqual(badRequest(new MissingParamError('any_value')))

@@ -1,5 +1,6 @@
 import { AccountModel } from '../../../domain/models/account-model'
 import { AuthenticationParams } from '../../../domain/use-cases/authentication'
+import { HashComparer } from '../../protocols/hash-comparer'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
 import { DbAuthentication } from './db-authentication'
 
@@ -11,13 +12,14 @@ class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
       email: 'any_email',
       password: 'any_password',
     }
-    return Promise.resolve(account)
+    return account
   }
 }
 
-type SutTypes = {
-  sut: DbAuthentication
-  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepositoryStub
+class HashComparerStub implements HashComparer {
+  async compare(value: string, hash: string): Promise<boolean> {
+    return Promise.resolve(true)
+  }
 }
 
 const makeAuthenticationParams = (): AuthenticationParams => ({
@@ -25,12 +27,20 @@ const makeAuthenticationParams = (): AuthenticationParams => ({
   password: '<PASSWORD>',
 })
 
+type SutTypes = {
+  sut: DbAuthentication
+  hashComparerStub: HashComparerStub
+  loadAccountByEmailRepositoryStub: LoadAccountByEmailRepositoryStub
+}
+
 const makeSut = (): SutTypes => {
+  const hashComparerStub = new HashComparerStub()
   const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
-  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub)
+  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub)
 
   return {
     sut,
+    hashComparerStub,
     loadAccountByEmailRepositoryStub,
   }
 }
@@ -73,5 +83,13 @@ describe('DbAuthentication', () => {
 
     const authResponse = await sut.auth(makeAuthenticationParams())
     expect(authResponse).toBeNull()
+  })
+
+  test('Should call HashComparer with correct values', async () => {
+    const { sut, hashComparerStub } = makeSut()
+    const hashSpy = jest.spyOn(hashComparerStub, 'compare')
+
+    await sut.auth(makeAuthenticationParams())
+    expect(hashSpy).toHaveBeenCalledWith(makeAuthenticationParams().password, 'any_password')
   })
 })
