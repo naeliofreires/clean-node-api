@@ -92,4 +92,31 @@ describe('DbAuthentication', () => {
     await sut.auth(makeAuthenticationParams())
     expect(hashSpy).toHaveBeenCalledWith(makeAuthenticationParams().password, 'any_password')
   })
+
+  test('Should throw if HashComparer throws', async () => {
+    const { sut, hashComparerStub } = makeSut()
+
+    jest.spyOn(hashComparerStub, 'compare').mockReturnValueOnce(
+      new Promise((_, reject) => {
+        reject(new Error())
+      })
+    )
+
+    const promise = sut.auth(makeAuthenticationParams())
+
+    await expect(promise).rejects.toThrow()
+  })
+
+  test('Should return null if HashComparer returns false', async () => {
+    const { sut, hashComparerStub } = makeSut()
+
+    jest.spyOn(hashComparerStub, 'compare').mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolve(false)
+      })
+    )
+
+    const authResponse = await sut.auth(makeAuthenticationParams())
+    expect(authResponse).toBeNull()
+  })
 })
