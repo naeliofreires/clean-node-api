@@ -2,6 +2,7 @@ import { AccountModel } from '../../../domain/models/account-model'
 import { AuthenticationParams } from '../../../domain/use-cases/authentication'
 import { HashComparer } from '../../protocols/hash-comparer'
 import { LoadAccountByEmailRepository } from '../../protocols/load-account-by-email-repository'
+import { TokenGenerator } from '../../protocols/token-generator'
 import { DbAuthentication } from './db-authentication'
 
 class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
@@ -22,6 +23,12 @@ class HashComparerStub implements HashComparer {
   }
 }
 
+class TokenGeneratorStub implements TokenGenerator {
+  async generate(value: string): Promise<string> {
+    return Promise.resolve('any_token')
+  }
+}
+
 const makeAuthenticationParams = (): AuthenticationParams => ({
   email: 'email@gmail.com',
   password: '<PASSWORD>',
@@ -31,17 +38,21 @@ type SutTypes = {
   sut: DbAuthentication
   hashComparerStub: HashComparerStub
   loadAccountByEmailRepositoryStub: LoadAccountByEmailRepositoryStub
+  tokenGeneratorStub: TokenGeneratorStub
 }
 
 const makeSut = (): SutTypes => {
   const hashComparerStub = new HashComparerStub()
   const loadAccountByEmailRepositoryStub = new LoadAccountByEmailRepositoryStub()
-  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub)
+  const tokenGeneratorStub = new TokenGeneratorStub()
+
+  const sut = new DbAuthentication(loadAccountByEmailRepositoryStub, hashComparerStub, tokenGeneratorStub)
 
   return {
     sut,
     hashComparerStub,
     loadAccountByEmailRepositoryStub,
+    tokenGeneratorStub,
   }
 }
 
@@ -118,5 +129,15 @@ describe('DbAuthentication', () => {
 
     const authResponse = await sut.auth(makeAuthenticationParams())
     expect(authResponse).toBeNull()
+  })
+
+  test('Should call TokenGenerator with correct values', async () => {
+    const { sut, tokenGeneratorStub } = makeSut()
+    const tokenSpy = jest.spyOn(tokenGeneratorStub, 'generate')
+
+    const generatedToken = await sut.auth(makeAuthenticationParams())
+
+    expect(tokenSpy).toHaveBeenCalledWith('any_id')
+    expect(generatedToken).toBe('any_token')
   })
 })
